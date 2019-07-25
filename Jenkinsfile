@@ -12,8 +12,9 @@ pipeline {
         stage('Dependencies') {
             agent {
                 docker {
-                    image 'python:3.7.3-alpine3.10'
                     label 'equipo01'
+                    image 'python:3.7.3-alpine3.10'
+                    args '--user 0:0'
                 }
             }
             steps {
