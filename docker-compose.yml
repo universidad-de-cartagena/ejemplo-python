@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+  backend:
+    # uwsgi:uwsgi is 100:101
+    image: ejemplo-python
+    build: .
+    environment:
+      - SECRET_KEY=Change-me-now!!!!
+      - DEBUG=True
+      - APP_UID=1000
+      - APP_GID=1000
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: volume
+        source: database_storage
+        target: /app/db
+      - type: bind
+        source: .
+        target: /app
+    depends_on:
+      - database
+
+  database:
+    # mysql:mysql is 999:999
+    image: mariadb:10.4.6-bionic
+    ports:
+      - "3306:3306"
+    volumes:
+      - database_storage:/var/lib/mysql
+
+volumes:
+  database_storage:
+
+    # command: python3 manage.py runserver 0.0.0.0:8080
+    # stdin_open: true
+    # tty: true

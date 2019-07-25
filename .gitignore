@@ -1,0 +1,16 @@
+# Python virtual env
+env/
+.env/
+# Environment variables
+.env
+__pycache__/
+# Compiled translations
+*.mo
+.vscode/
+# Database
+*.sqlite3
+# Test reports
+test_results/
+coverage.xml
+.coverage
+htmlcov/
