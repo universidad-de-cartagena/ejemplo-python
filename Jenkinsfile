@@ -11,17 +11,10 @@ pipeline {
     stages {
         stage('Dependencies') {
             agent {
-                docker {
-                    image 'python:3.7.3-alpine3.10'
-                }
+                label 'equipo01'
             }
             steps {
-                sh 'id'
-                sh 'pwd'
-                sh 'ls -alh'
-                sh 'pip3 install --upgrade pip'
-                sh 'pip3 install --no-cache-dir -r requirements.txt'
-                sh 'python3 scripts/generate_secret_key.py'
+                sh 'docker build -t ejemplo-python:latest .'
             }
             post{
                 always{
@@ -69,5 +62,42 @@ pipeline {
     //         mailIfStatusChanged env.EMAIL_RECIPIENTS
     //     }
     // }
+
+        // stage('Dependencies') {
+        //     agent {
+        //         docker {
+        //             label 'equipo01'
+        //             image 'python:3.7.3-alpine3.10'
+        //         }
+        //     }
+        //     steps {
+        //         sh 'id'
+        //         sh 'pwd'
+        //         sh 'ls -alh'
+        //         sh 'pip3 install --upgrade pip'
+        //         sh 'pip3 install --no-cache-dir -r requirements.txt'
+        //         sh 'python3 scripts/generate_secret_key.py'
+        //     }
+        //     post{
+        //         always{
+        //             echo "====++++always++++===="
+        //         }
+        //         success{
+        //             echo "====++++A executed succesfully++++===="
+        //         }
+        //         failure{
+        //             echo "====++++A execution failed++++===="
+        //         }
+        //     }
+        // }
+
+// https://go.cloudbees.com/docs/plugins/docker-workflow/#docker-workflow-sect-build
+//   git '…'
+//   def newApp = docker.build "mycorp/myapp:${env.BUILD_TAG}"
+//   newApp.push() // record this snapshot (optional)
+//   stage 'Test image'
+//   // run some tests on it (see below), then if everything looks good:
+//   stage 'Approve image'
+//   newApp.push 'latest'
     }
 }
