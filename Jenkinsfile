@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'docker && equipo01' }
+    agent none
 // Simple vs Double quotes
 // https://stackoverflow.com/questions/37464887/vs-vs-in-groovy-when-to-use-what
 
@@ -13,6 +13,7 @@ pipeline {
             agent {
                 docker {
                     image 'python:3.7.3-alpine3.10'
+                    label 'equipo01'
                 }
             }
             steps {
