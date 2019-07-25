@@ -2,14 +2,13 @@ pipeline {
     agent {
         label 'docker && equipo01'
     }
-
 // Simple vs Double quotes
 // https://stackoverflow.com/questions/37464887/vs-vs-in-groovy-when-to-use-what
 
-    // options {
-    //     disableConcurrentBuilds()
-    //     buildDiscarder(logRotator(numToKeepStr: '10'))
-    // }
+    options {
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
 
     stages {
         stage('Dependencies') {
@@ -70,4 +69,5 @@ pipeline {
     //         mailIfStatusChanged env.EMAIL_RECIPIENTS
     //     }
     // }
+    }
 }
