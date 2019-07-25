@@ -1,21 +1,21 @@
 pipeline {
-    agent {
-        label 'docker && equipo01'
-    }
+    agent { label 'docker && equipo01' }
 // Simple vs Double quotes
 // https://stackoverflow.com/questions/37464887/vs-vs-in-groovy-when-to-use-what
 
-    options {
-        disableConcurrentBuilds()
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-    }
+    // options {
+    //     disableConcurrentBuilds()
+    //     buildDiscarder(logRotator(numToKeepStr: '10'))
+    // }
 
     stages {
         stage('Dependencies') {
-            steps {
-                agent {
-                    docker { image 'python:3.7.3-alpine3.10' }
+            agent {
+                docker {
+                    image 'python:3.7.3-alpine3.10'
                 }
+            }
+            steps {
                 sh 'pip install --upgrade pip'
                 sh 'pip3 install --no-cache-dir -r requirements.txt'
                 sh 'ls -alh'
