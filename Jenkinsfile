@@ -14,9 +14,7 @@ pipeline {
         stage('Dependencies') {
             steps {
                 agent {
-                    docker {
-                        image 'python:3.7.3-alpine3.10'
-                    }
+                    docker { image 'python:3.7.3-alpine3.10' }
                 }
                 sh 'pip install --upgrade pip'
                 sh 'pip3 install --no-cache-dir -r requirements.txt'
