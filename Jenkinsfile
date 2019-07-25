@@ -16,9 +16,11 @@ pipeline {
                 }
             }
             steps {
-                sh 'pip install --upgrade pip'
-                sh 'pip3 install --no-cache-dir -r requirements.txt'
+                sh 'id'
+                sh 'pwd'
                 sh 'ls -alh'
+                sh 'pip3 install --upgrade pip'
+                sh 'pip3 install --no-cache-dir -r requirements.txt'
                 sh 'python3 scripts/generate_secret_key.py'
             }
             post{
