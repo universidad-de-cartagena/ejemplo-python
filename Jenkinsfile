@@ -20,8 +20,8 @@ pipeline {
                 sh 'id'
                 sh 'pwd'
                 sh 'ls -alh'
-                sh 'pip3 install --upgrade pip'
-                sh 'pip3 install --no-cache-dir -r requirements.txt'
+                sh 'pip3 install --upgrade --user pip'
+                sh 'pip3 install --no-cache-dir --user -r requirements.txt'
                 sh 'python3 scripts/generate_secret_key.py'
             }
             post{
