@@ -14,8 +14,8 @@ env = Env(
     DATABASE_URL=(str, 'sqlite:///' + join(BASE_DIR, 'database/db.sqlite3'))
 )
 
-# Reads .env file only if using DEBUG
-Env.read_env() if env('DEBUG')
+if env('DEBUG'):
+    Env.read_env()  # Reads .env file
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
