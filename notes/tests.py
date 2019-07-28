@@ -15,6 +15,20 @@ class NotesBussinessLogicTest(TestCase):
         result = bussiness_logic.listNotes()
         self.assertListEqual(expected_result, result)
 
+    def test_array_of_2_notes(self):
+        """
+        When starting the program, an empty array should be returned
+        """
+        expected_result = []
+        expected_result.append({
+            'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'
+        })
+        expected_result.append({
+            'title': 'Mi genial nota 2', 'author': 'Amaury Pruebas 2', 'body': 'Unit testing x2'
+        })
+        result = bussiness_logic.listNotes()
+        self.assertListEqual(expected_result, result)
+
     def test_creation_of_note(self):
         """
         Creating a note with all the normal parameters
