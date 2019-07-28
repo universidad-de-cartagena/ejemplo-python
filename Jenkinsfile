@@ -58,17 +58,15 @@ pipeline {
         sh './env/bin/coverage report --show-missing -m'
         sh './env/bin/coverage html'
         script {
-          script {
-            publishHTML([
-              allowMissing: false,
-              alwaysLinkToLastBuild: true,
-              keepAll: true,
-              reportDir: 'htmlcov/',
-              reportFiles: 'index.html',
-              reportName: 'Coverage report in HTML',
-              reportTitles: ''
-            ])
-          }
+          publishHTML([
+            allowMissing: false,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: 'htmlcov/',
+            reportFiles: 'index.html',
+            reportName: 'Coverage report in HTML',
+            reportTitles: ''
+          ])
         }
 
         sh 'rm -rf htmlcov'
