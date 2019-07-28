@@ -46,4 +46,4 @@ def deleteNote(note_uuid):
         found_note = Note.objects.get(uuid=note_uuid)
     except Note.DoesNotExist as e:
         raise Note.DoesNotExist(f'deleteNote could not delete the note because getNote could not find a note with uuid: {str(note_uuid)}') from e
-    Note.objects.filter(uuid=note_uuid).delete()
+    Note.objects.filter(uuid=found_note.uuid).delete()
