@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent 'equipo01'
 // Simple vs Double quotes
 // https://stackoverflow.com/questions/37464887/vs-vs-in-groovy-when-to-use-what
 
@@ -10,9 +10,6 @@ pipeline {
 
     stages {
         stage('Build image') {
-            agent {
-                label 'equipo01'
-            }
             steps {
                 sh 'docker build -t ejemplo-python:latest .'
             }
@@ -29,7 +26,7 @@ pipeline {
             }
         }
         stage('Tests') {
-            agent { label 'equipo01' dockerifle true }
+            agent { dockerifle true }
             steps {
                 sh 'coverage run --source='.' manage.py test --noinput || true'
                 sh 'coverage report --show-missing -m'
