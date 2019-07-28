@@ -2,6 +2,7 @@ from json import loads
 
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils.timezone import localtime, now
 
 from .services import bussiness_logic
 
@@ -19,15 +20,18 @@ class NotesBussinessLogicTest(TestCase):
         """
         When starting the program, an empty array should be returned
         """
-        expected_result = []
-        expected_result.append({
-            'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'
-        })
-        expected_result.append({
-            'title': 'Mi genial nota 2', 'author': 'Amaury Pruebas 2', 'body': 'Unit testing x2'
-        })
+        expected_result = [
+            {'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'},
+            {'title': 'Mi genial nota 2', 'author': 'Amaury Pruebas 2', 'body': 'Unit testing x2'}
+        ]
+        for note in expected_result:
+            inserted_note = bussiness_logic.createNote(title=note['title'], author=note['author'], body=note['body'])
+            self.assertEqual(note['title'], inserted_note['title'])
+            self.assertEqual(note['author'], inserted_note['author'])
+            self.assertEqual(note['body'], inserted_note['body'])
+            self.assertTrue(now() > inserted_note['created_at'])
         result = bussiness_logic.listNotes()
-        self.assertListEqual(expected_result, result)
+        self.assertEqual(len(expected_result), len(result))
 
     def test_creation_of_note(self):
         """
