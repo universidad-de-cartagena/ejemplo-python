@@ -9,7 +9,7 @@ pipeline {
     // }
 
     stages {
-        stage('Dependencies') {
+        stage('Build image') {
             agent {
                 label 'equipo01'
             }
@@ -25,6 +25,30 @@ pipeline {
                 }
                 failure{
                     echo "====++++A execution failed++++===="
+                }
+            }
+        }
+        stage('Tests') {
+            agent { label 'equipo01' dockerifle true }
+            steps {
+                sh 'coverage run --source='.' manage.py test --noinput || true'
+                sh 'coverage report --show-missing -m'
+                sh 'coverage html'
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'htmlcov/', reportFiles: 'index.html', reportName: 'Coverage report', reportTitles: ''])
+                sh 'rm -rdf htmlcov'
+                sh 'coverage xml'
+                cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+                sh 'rm .coverage coverage.xml'
+            }
+            post{
+                always{
+                    echo "always"
+                }
+                success{
+                    echo "A executed succesfully"
+                }
+                failure{
+                    echo "A execution failed"
                 }
             }
         }
