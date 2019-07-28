@@ -29,15 +29,21 @@ pipeline {
         }
         stage('Tests') {
             agent {
-                dockerfile true
+                docker {
+                    label 'equipo01'
+                    image 'python:3.7.3-alpine3.10'
+                }
             }
             steps {
-                sh 'coverage run --source='.' manage.py test --noinput || true'
-                sh 'coverage report --show-missing -m'
-                sh 'coverage html'
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'htmlcov/', reportFiles: 'index.html', reportName: 'Coverage report', reportTitles: ''])
-                sh 'rm -rdf htmlcov'
-                sh 'coverage xml'
+                sh 'python -m venv env'
+                sh './env/bin/pip3 install --no-cache-dir --upgrade pip'
+                sh './env/bin/pip3 install --no-cache-dir -r requirements.txt'
+                sh './env/bin/coverage run --source=\'.\' manage.py test --noinput || true'
+                sh './env/bin/coverage report --show-missing -m'
+                sh './env/bin/coverage html'
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'htmlcov/', reportFiles: 'index.html', reportName: 'Coverage report HTML', reportTitles: ''])
+                sh 'rm -rf htmlcov'
+                sh './env/bin/coverage xml'
                 cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
                 sh 'rm .coverage coverage.xml'
             }
