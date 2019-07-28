@@ -41,7 +41,7 @@ pipeline {
                 sh './env/bin/coverage run --source=\'.\' manage.py test --noinput || true'
                 sh './env/bin/coverage report --show-missing -m'
                 sh './env/bin/coverage html'
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'htmlcov/', reportFiles: 'index.html', reportName: 'Coverage report HTML', reportTitles: ''])
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'htmlcov/', reportFiles: 'index.html', reportName: 'Coverage report in HTML', reportTitles: ''])
                 sh 'rm -rf htmlcov'
                 sh './env/bin/coverage xml'
                 cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
