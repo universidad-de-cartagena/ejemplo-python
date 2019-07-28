@@ -54,7 +54,7 @@ pipeline {
         sh 'python -m venv env'
         sh './env/bin/pip3 install --no-cache-dir --upgrade pip'
         sh './env/bin/pip3 install --no-cache-dir -r requirements.txt'
-        sh './env/bin/coverage run --source . --omit env/ manage.py test --no-input || true'
+        sh "./env/bin/coverage run --source='.' --omit='env/' manage.py test --no-input || true"
         sh './env/bin/coverage report --show-missing -m'
         sh './env/bin/coverage html'
         script {
