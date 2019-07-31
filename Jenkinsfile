@@ -2,24 +2,22 @@ pipeline {
   agent {
     label 'equipo01'
   }
+  environment {
+    DOCKERHUB_CREDENTIALS = credentials('dockerhub-account')
+  }
   stages {
     stage('Build image') {
       post {
-        always {
-          echo '====++++always++++===='
-
-        }
-
         success {
           echo '====++++A executed succesfully++++===='
-
+          sh "docker login --username ${DOCKERHUB_CREDENTIALS_USR} --password ${DOCKERHUB_CREDENTIALS_PSW}"
+          sh 'docker tag ejemplo-python:latest equipo01-backend:latest'
+          sh 'docker push equipo01-backend:latest'
         }
-
         failure {
           echo '====++++A execution failed++++===='
-
+          sh 'docker container prune -f'
         }
-
       }
       steps {
         sh 'docker build -t ejemplo-python:latest .'
@@ -29,26 +27,8 @@ pipeline {
       agent {
         docker {
           label 'equipo01'
-          image 'python:3.7.3-alpine3.10'
+          image 'python:3.7.4-stretch'
         }
-
-      }
-      post {
-        always {
-          echo 'always'
-
-        }
-
-        success {
-          echo 'A executed succesfully'
-
-        }
-
-        failure {
-          echo 'A execution failed'
-
-        }
-
       }
       steps {
         sh 'python -m venv env'
@@ -68,12 +48,22 @@ pipeline {
             reportTitles: ''
           ])
         }
-
         sh 'rm -rf htmlcov'
         sh './env/bin/coverage xml'
         cobertura(coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', methodCoverageTargets: '80, 0, 0', sourceEncoding: 'ASCII')
         sh 'rm .coverage coverage.xml'
         junit(testResults: 'test_results/*.xml', allowEmptyResults: true)
+      }
+    }
+    stage('Deploy') {
+      post {
+        failure {
+          echo 'A execution failed'
+          echo 'docker-compose -f docker-compose.prod-yml down -v -t 0 --remove-orphans --rmi all'
+        }
+      }
+      steps {
+        sh 'docker-compose -f docker-compose.prod-yml up -d'
       }
     }
   }

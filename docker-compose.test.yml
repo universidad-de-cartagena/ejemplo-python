@@ -1,9 +1,0 @@
-version: '3.4'
-services:
-  backend:
-    image: ejemplo-python
-    environment:
-      - DEBUG=True
-      # - APP_UID=1000
-      # - APP_GID=1000
-    command: python3 manage.py test

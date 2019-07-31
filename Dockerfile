@@ -1,10 +1,15 @@
-FROM python:3.7.3-alpine3.10
+FROM python:3.7.4-stretch
 
 WORKDIR /app
 
 # Dependencies
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt \
+    && apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        python3-dev \
+        default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Code
 COPY notes/ notes/
