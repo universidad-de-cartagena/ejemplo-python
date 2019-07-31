@@ -37,7 +37,14 @@ class NotesBussinessLogicTest(TestCase):
         """
         Creating a note with all the normal parameters
         """
-        pass
+        expected_result = {'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing', 'created_at': now()}
+        result = bussiness_logic.createNote(
+            title=expected_result['title'], author=expected_result['author'], body=expected_result['body']
+        )
+        self.assertEqual(expected['title'], result['title'])
+        self.assertEqual(expected['author'], result['author'])
+        self.assertEqual(expected['uuid'], result['body'])
+        self.assertTrue(expected['created_at'] < result['created_at'])
 
 
 class NotesIntegrationTest(TestCase):
