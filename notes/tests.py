@@ -1,4 +1,5 @@
 from json import loads
+from uuid import UUID
 
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -41,11 +42,21 @@ class NotesBussinessLogicTest(TestCase):
         result = bussiness_logic.createNote(
             title=expected_result['title'], author=expected_result['author'], body=expected_result['body']
         )
-        self.assertEqual(expected['title'], result['title'])
-        self.assertEqual(expected['author'], result['author'])
-        self.assertEqual(expected['uuid'], result['body'])
-        self.assertTrue(expected['created_at'] < result['created_at'])
+        self.assertEqual(expected_result['title'], result['title'])
+        self.assertEqual(expected_result['author'], result['author'])
+        self.assertEqual(expected_result['body'], result['body'])
+        self.assertTrue(expected_result['created_at'] < result['created_at'])
+        self.assertIsInstance(result['uuid'], UUID)
 
+    def test_delete_note(self):
+        inserted_note = {'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing', 'created_at': now()}
+        self.assertListEqual(bussiness_logic.listNotes(), [])
+        result = bussiness_logic.createNote(
+            title=inserted_note['title'], author=inserted_note['author'], body=inserted_note['body']
+        )
+        self.assertEqual(len(bussiness_logic.listNotes()), 1)
+        bussiness_logic.deleteNote(result['uuid'])
+        self.assertListEqual(bussiness_logic.listNotes(), [])
 
 class NotesIntegrationTest(TestCase):
     def test_empty_array_of_notes(self):
