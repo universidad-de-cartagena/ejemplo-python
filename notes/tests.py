@@ -1,11 +1,15 @@
-from json import loads
+from json import loads, dumps
 from uuid import UUID
+from namegenerator import gen as random_name
+from random import randint
+from datetime import datetime
 
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import localtime, now
 
 from .services import bussiness_logic
+from .models import Note
 
 
 class NotesBussinessLogicTest(TestCase):
@@ -22,11 +26,15 @@ class NotesBussinessLogicTest(TestCase):
         When starting the program, an empty array should be returned
         """
         expected_result = [
-            {'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'},
-            {'title': 'Mi genial nota 2', 'author': 'Amaury Pruebas 2', 'body': 'Unit testing x2'}
+            {'title': 'Mi genial nota', 'author': 'Amaury Pruebas',
+                'body': 'Unit testing'},
+            {'title': 'Mi genial nota 2', 'author': 'Amaury Pruebas 2',
+                'body': 'Unit testing x2'}
         ]
         for note in expected_result:
-            inserted_note = bussiness_logic.createNote(title=note['title'], author=note['author'], body=note['body'])
+            inserted_note = bussiness_logic.createNote(
+                title=note['title'], author=note['author'], body=note['body']
+            )
             self.assertEqual(note['title'], inserted_note['title'])
             self.assertEqual(note['author'], inserted_note['author'])
             self.assertEqual(note['body'], inserted_note['body'])
@@ -38,32 +46,58 @@ class NotesBussinessLogicTest(TestCase):
         """
         Creating a note with all the normal parameters
         """
-        expected_result = {'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing', 'created_at': now()}
+        expected_result = {
+            'title': 'Mi genial nota', 'author': 'Amaury Pruebas',
+            'body': 'Unit testing', 'created_at': now()
+        }
         result = bussiness_logic.createNote(
             title=expected_result['title'], author=expected_result['author'], body=expected_result['body']
         )
         self.assertEqual(expected_result['title'], result['title'])
         self.assertEqual(expected_result['author'], result['author'])
         self.assertEqual(expected_result['body'], result['body'])
-        self.assertTrue(expected_result['created_at'] < result['created_at'])
+        self.assertLessEqual(
+            expected_result['created_at'], result['created_at'])
         self.assertIsInstance(result['uuid'], UUID)
 
     def test_delete_note(self):
-        inserted_note = {'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing', 'created_at': now()}
-        self.assertListEqual(bussiness_logic.listNotes(), [])
+        note_to_insert = {
+            'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'
+        }
         result = bussiness_logic.createNote(
-            title=inserted_note['title'], author=inserted_note['author'], body=inserted_note['body']
+            title=note_to_insert['title'], author=note_to_insert['author'], body=note_to_insert['body']
         )
-        self.assertEqual(len(bussiness_logic.listNotes()), 1)
         bussiness_logic.deleteNote(result['uuid'])
         self.assertListEqual(bussiness_logic.listNotes(), [])
+        with self.assertRaises(Note.DoesNotExist):
+            bussiness_logic.getNote(result['uuid'])
+            bussiness_logic.deleteNote(result['uuid'])
+
+    def test_get_inserted_note_after_inserting_5_notes(self):
+        random_name()
+        note_to_insert = {
+            'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'
+        }
+        for i in range(5):
+            bussiness_logic.createNote(
+                title=random_name(), author=random_name(), body=random_name()
+            )
+        random_note_to_get = bussiness_logic.listNotes()[randint(0, 4)]
+        result = bussiness_logic.getNote(random_note_to_get['uuid'])
+        self.assertIsNotNone(result)
+        self.assertIsInstance(result['uuid'], UUID)
+        self.assertIsInstance(result['title'], str)
+        self.assertIsInstance(result['author'], str)
+        self.assertIsInstance(result['body'], str)
+        self.assertIsInstance(result['created_at'], datetime)
+
 
 class NotesIntegrationTest(TestCase):
     def test_empty_array_of_notes(self):
         """
         When starting the program, an empty JSON should be returned
         """
-        expected_body = ["name"]
+        expected_body = []
         expected_header = 'application/json'
         expected_status_code = 200
 
@@ -72,3 +106,19 @@ class NotesIntegrationTest(TestCase):
         self.assertEqual(response.status_code, expected_status_code)
         self.assertEqual(response['Content-Type'], expected_header)
         self.assertListEqual(loads(response.content), expected_body)
+
+    def test_insert_note(self):
+        body_received = {
+            'title': 'super titulo',
+            'body': 'super mega contenido raro',
+            'author': 'Amaury Ortega'
+        }
+        expected_header = 'application/json'
+        expected_status_code = 200
+        response = self.client.post(
+            reverse('notes.index'), dumps(body_received), 'application/json'
+        )
+        print(loads(response.content))
+        # self.assertEqual(response.status_code, expected_status_code)
+        # self.assertEqual(response['Content-Type'], expected_header)
+        # self.assertEqual(loads(response.content)['title'], expected_body)
