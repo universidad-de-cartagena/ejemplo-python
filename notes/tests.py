@@ -95,7 +95,7 @@ class NotesBussinessLogicTest(TestCase):
 class NotesIntegrationTest(TestCase):
     def test_empty_array_of_notes(self):
         """
-        When starting the program, an empty JSON should be returned
+        When starting the program, an empty JSON array must be returned
         """
         expected_body = []
         expected_header = 'application/json'
@@ -105,20 +105,33 @@ class NotesIntegrationTest(TestCase):
 
         self.assertEqual(response.status_code, expected_status_code)
         self.assertEqual(response['Content-Type'], expected_header)
-        self.assertListEqual(loads(response.content), expected_body)
+        self.assertListEqual(response.json(), expected_body)
 
     def test_insert_note(self):
-        body_received = {
+        sent_body = {
             'title': 'super titulo',
             'body': 'super mega contenido raro',
             'author': 'Amaury Ortega'
         }
-        expected_header = 'application/json'
+        sent_header = 'application/json'
+
+        expected_body = sent_body
         expected_status_code = 200
+        expected_header = sent_header
+
         response = self.client.post(
-            reverse('notes.index'), dumps(body_received), 'application/json'
+            reverse('notes.index'), dumps(sent_body), 'application/json'
         )
-        print(loads(response.content))
-        # self.assertEqual(response.status_code, expected_status_code)
-        # self.assertEqual(response['Content-Type'], expected_header)
-        # self.assertEqual(loads(response.content)['title'], expected_body)
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertEqual(sent_body['title'], response.json()['title'])
+        self.assertEqual(sent_body['body'], response.json()['body'])
+        self.assertEqual(sent_body['author'], response.json()['author'])
+        self.assertGreaterEqual(
+            now(),
+            datetime.strptime(
+                response.json()['created_at'], "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+        )
+        self.assertIsInstance(UUID(response.json()['uuid']), UUID)
+
