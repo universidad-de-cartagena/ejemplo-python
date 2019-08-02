@@ -1,5 +1,5 @@
 from json import loads, dumps
-from uuid import UUID
+from uuid import UUID, uuid4
 from namegenerator import gen as random_name
 from random import randint
 from datetime import datetime
@@ -71,6 +71,7 @@ class NotesBussinessLogicTest(TestCase):
         self.assertListEqual(bussiness_logic.listNotes(), [])
         with self.assertRaises(Note.DoesNotExist):
             bussiness_logic.getNote(result['uuid'])
+        with self.assertRaises(Note.DoesNotExist):
             bussiness_logic.deleteNote(result['uuid'])
 
     def test_get_inserted_note_after_inserting_5_notes(self):
@@ -113,11 +114,10 @@ class NotesIntegrationTest(TestCase):
             'body': 'super mega contenido raro',
             'author': 'Amaury Ortega'
         }
-        sent_header = 'application/json'
 
         expected_body = sent_body
         expected_status_code = 200
-        expected_header = sent_header
+        expected_header = 'application/json'
 
         response = self.client.post(
             reverse('notes.index'), dumps(sent_body), 'application/json'
@@ -135,3 +135,114 @@ class NotesIntegrationTest(TestCase):
         )
         self.assertIsInstance(UUID(response.json()['uuid']), UUID)
 
+    def test_get_insert_note(self):
+        created_note = bussiness_logic.createNote(
+            title='super titulo', author='Amaury Ortega', body='Amaury Ortega'
+        )
+        expected_note = {
+            'title': created_note['title'],
+            'body': created_note['body'],
+            'author': created_note['author'],
+            'uuid': str(created_note['uuid'])
+        }
+        expected_status_code = 200
+        expected_header = 'application/json'
+
+        response = self.client.get(
+            reverse('notes.index') + str(created_note['uuid'])
+        )
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertEqual(expected_note['title'], response.json()['title'])
+        self.assertEqual(expected_note['body'], response.json()['body'])
+        self.assertEqual(expected_note['author'], response.json()['author'])
+        self.assertGreaterEqual(
+            now(),
+            datetime.strptime(
+                response.json()['created_at'], "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+        )
+        self.assertIsInstance(UUID(response.json()['uuid']), UUID)
+
+    def test_delete_note(self):
+        created_note = bussiness_logic.createNote(
+            title='super titulo', author='Amaury Ortega', body='Amaury Ortega'
+        )
+        expected_status_code = 200
+        expected_header = 'application/json'
+        expected_body = {
+            'message': f"Note with UUID: {str(created_note['uuid'])} has been deleted"
+        }
+        response = self.client.delete(
+            reverse('notes.index') + str(created_note['uuid'])
+        )
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertDictEqual(expected_body, response.json())
+    
+    def test_delete_non_existent_note(self):
+        expected_status_code = 404
+        expected_header = 'application/json'
+        random_uuid = str(uuid4())
+        expected_body = {
+            'message': 'No note was found with UUID: ' + random_uuid
+        }
+        response = self.client.delete(
+            reverse('notes.index') + random_uuid
+        )
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertDictEqual(expected_body, response.json())
+
+    def test_delete_endpoint_without_uuid(self):
+        expected_status_code = 400
+        expected_header = 'application/json'
+        expected_body = {
+            'message': 'Provide the UUID of the note that wants to be deleted'
+        }
+        response = self.client.delete(reverse('notes.index'))
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertDictEqual(expected_body, response.json())
+
+    def test_get_endpoint_without_uuid(self):
+        expected_status_code = 404
+        expected_header = 'application/json'
+        random_uuid = str(uuid4())
+        expected_body = {
+            'message': 'No note was found with UUID: ' + random_uuid
+        }
+        response = self.client.get(reverse('notes.index') + random_uuid)
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertDictEqual(expected_body, response.json())
+
+    def test_non_supported_http_method(self):
+        expected_status_code = 405
+        expected_header = 'application/json'
+        expected_body = {
+            'message': "Use one of the accepted HTTP methods ['GET', 'POST', 'DELETE']"
+        }
+        response = self.client.patch(reverse('notes.index'))
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertDictEqual(expected_body, response.json())
+
+        response = self.client.put(reverse('notes.index'))
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertDictEqual(expected_body, response.json())
+
+        response = self.client.options(reverse('notes.index'))
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertDictEqual(expected_body, response.json())
+
+        response = self.client.trace(reverse('notes.index'))
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
+        self.assertDictEqual(expected_body, response.json())
+
+        response = self.client.head(reverse('notes.index'))
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response['Content-Type'], expected_header)
