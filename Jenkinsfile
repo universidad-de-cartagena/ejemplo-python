@@ -59,11 +59,11 @@ pipeline {
       post {
         failure {
           echo 'A execution failed'
-          echo 'docker-compose -f docker-compose.prod-yml down -v -t 0 --remove-orphans --rmi all'
+          echo 'docker-compose down -v -t 0 --remove-orphans --rmi all'
         }
       }
       steps {
-        sh 'docker-compose -f docker-compose.prod-yml up -d'
+        sh 'docker-compose up -d'
       }
     }
   }
