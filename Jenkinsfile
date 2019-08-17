@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('Kill everything') {
       steps {
-        sh 'docker-compose down -v -t 0 --remove-orphans --rmi all || true'
+        sh 'docker-compose down -v -t 0 --remove-orphans --rmi local || true'
       }
     }
     stage('Build image') {
