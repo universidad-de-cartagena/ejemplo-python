@@ -10,9 +10,9 @@ pipeline {
       post {
         success {
           echo '====++++A executed succesfully++++===='
-          sh "docker login --username ${DOCKERHUB_CREDENTIALS_USR} --password ${DOCKERHUB_CREDENTIALS_PSW}"
-          sh 'docker tag ejemplo-python:latest equipo01-backend:latest'
-          sh 'docker push equipo01-backend:latest'
+          // sh "docker login --username ${DOCKERHUB_CREDENTIALS_USR} --password ${DOCKERHUB_CREDENTIALS_PSW}"
+          // sh 'docker tag ejemplo-python:latest equipo01-backend:latest'
+          // sh 'docker push equipo01-backend:latest'
         }
         failure {
           echo '====++++A execution failed++++===='
