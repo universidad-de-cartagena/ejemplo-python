@@ -9,7 +9,6 @@ from .services import createNote, deleteNote, getNote, listNotes
 from .models import Note
 
 json_dumps_params = {'sort_keys': True, 'indent': 2}
-colombia_time_zone = timezone.pytz.timezone('America/Bogota')
 accepted_http_methods = ['GET', 'POST', 'DELETE']
 
 
