@@ -8,17 +8,17 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import localtime, now
 
-from .services import bussiness_logic
+from .services import business_logic
 from .models import Note
 
 
-class NotesBussinessLogicTest(TestCase):
+class NotesBusinessLogicTest(TestCase):
     def test_empty_array_of_notes(self):
         """
         When starting the program, an empty array should be returned
         """
         expected_result = []
-        result = bussiness_logic.listNotes()
+        result = business_logic.listNotes()
         self.assertListEqual(expected_result, result)
 
     def test_array_of_2_notes(self):
@@ -32,14 +32,14 @@ class NotesBussinessLogicTest(TestCase):
                 'body': 'Unit testing x2'}
         ]
         for note in expected_result:
-            inserted_note = bussiness_logic.createNote(
+            inserted_note = business_logic.createNote(
                 title=note['title'], author=note['author'], body=note['body']
             )
             self.assertEqual(note['title'], inserted_note['title'])
             self.assertEqual(note['author'], inserted_note['author'])
             self.assertEqual(note['body'], inserted_note['body'])
             self.assertTrue(now() > inserted_note['created_at'])
-        result = bussiness_logic.listNotes()
+        result = business_logic.listNotes()
         self.assertEqual(len(expected_result), len(result))
 
     def test_creation_of_note(self):
@@ -50,7 +50,7 @@ class NotesBussinessLogicTest(TestCase):
             'title': 'Mi genial nota', 'author': 'Amaury Pruebas',
             'body': 'Unit testing', 'created_at': now()
         }
-        result = bussiness_logic.createNote(
+        result = business_logic.createNote(
             title=expected_result['title'], author=expected_result['author'], body=expected_result['body']
         )
         self.assertEqual(expected_result['title'], result['title'])
@@ -64,15 +64,15 @@ class NotesBussinessLogicTest(TestCase):
         note_to_insert = {
             'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'
         }
-        result = bussiness_logic.createNote(
+        result = business_logic.createNote(
             title=note_to_insert['title'], author=note_to_insert['author'], body=note_to_insert['body']
         )
-        bussiness_logic.deleteNote(result['uuid'])
-        self.assertListEqual(bussiness_logic.listNotes(), [])
+        business_logic.deleteNote(result['uuid'])
+        self.assertListEqual(business_logic.listNotes(), [])
         with self.assertRaises(Note.DoesNotExist):
-            bussiness_logic.getNote(result['uuid'])
+            business_logic.getNote(result['uuid'])
         with self.assertRaises(Note.DoesNotExist):
-            bussiness_logic.deleteNote(result['uuid'])
+            business_logic.deleteNote(result['uuid'])
 
     def test_get_inserted_note_after_inserting_5_notes(self):
         random_name()
@@ -80,11 +80,11 @@ class NotesBussinessLogicTest(TestCase):
             'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'
         }
         for i in range(5):
-            bussiness_logic.createNote(
+            business_logic.createNote(
                 title=random_name(), author=random_name(), body=random_name()
             )
-        random_note_to_get = bussiness_logic.listNotes()[randint(0, 4)]
-        result = bussiness_logic.getNote(random_note_to_get['uuid'])
+        random_note_to_get = business_logic.listNotes()[randint(0, 4)]
+        result = business_logic.getNote(random_note_to_get['uuid'])
         self.assertIsNotNone(result)
         self.assertIsInstance(result['uuid'], UUID)
         self.assertIsInstance(result['title'], str)
@@ -136,7 +136,7 @@ class NotesIntegrationTest(TestCase):
         self.assertIsInstance(UUID(response.json()['uuid']), UUID)
 
     def test_get_insert_note(self):
-        created_note = bussiness_logic.createNote(
+        created_note = business_logic.createNote(
             title='super titulo', author='Amaury Ortega', body='Amaury Ortega'
         )
         expected_note = {
@@ -165,7 +165,7 @@ class NotesIntegrationTest(TestCase):
         self.assertIsInstance(UUID(response.json()['uuid']), UUID)
 
     def test_delete_note(self):
-        created_note = bussiness_logic.createNote(
+        created_note = business_logic.createNote(
             title='super titulo', author='Amaury Ortega', body='Amaury Ortega'
         )
         expected_status_code = 200
