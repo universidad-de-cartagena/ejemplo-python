@@ -6,6 +6,11 @@ pipeline {
   //   DOCKERHUB_CREDENTIALS = credentials('dockerhub-account')
   // }
   stages {
+    stage('Kill everything') {
+      steps {
+        sh 'docker-compose down -v -t 0 --remove-orphans --rmi local || true'
+      }
+    }
     stage('Build image') {
       post {
         success {
