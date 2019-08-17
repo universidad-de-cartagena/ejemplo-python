@@ -2,9 +2,9 @@ pipeline {
   agent {
     label 'equipo01'
   }
-  environment {
-    DOCKERHUB_CREDENTIALS = credentials('dockerhub-account')
-  }
+  // environment {
+  //   DOCKERHUB_CREDENTIALS = credentials('dockerhub-account')
+  // }
   stages {
     stage('Build image') {
       post {
