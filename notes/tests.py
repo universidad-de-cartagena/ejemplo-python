@@ -22,9 +22,6 @@ class NotesBusinessLogicTest(TestCase):
         self.assertListEqual(expected_result, result)
 
     def test_array_of_2_notes(self):
-        """
-        When starting the program, an empty array should be returned
-        """
         expected_result = [
             {'title': 'Mi genial nota', 'author': 'Amaury Pruebas',
                 'body': 'Unit testing'},
