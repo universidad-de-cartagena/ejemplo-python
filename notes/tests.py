@@ -72,7 +72,6 @@ class NotesBusinessLogicTest(TestCase):
             business_logic.deleteNote(result['uuid'])
 
     def test_get_inserted_note_after_inserting_5_notes(self):
-        random_name()
         note_to_insert = {
             'title': 'Mi genial nota', 'author': 'Amaury Pruebas', 'body': 'Unit testing'
         }
