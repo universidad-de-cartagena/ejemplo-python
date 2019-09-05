@@ -131,7 +131,7 @@ class NotesIntegrationTest(TestCase):
         )
         self.assertIsInstance(UUID(response.json()['uuid']), UUID)
 
-    def test_get_insert_note(self):
+    def test_get_inserted_note(self):
         created_note = business_logic.createNote(
             title='super titulo', author='Amaury Ortega', body='Amaury Ortega'
         )
