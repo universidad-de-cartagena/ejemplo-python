@@ -201,7 +201,7 @@ class NotesIntegrationTest(TestCase):
         self.assertEqual(response['Content-Type'], expected_header)
         self.assertDictEqual(expected_body, response.json())
 
-    def test_get_endpoint_without_uuid(self):
+    def test_get_endpoint_with_non_existent_uuid(self):
         expected_status_code = 404
         expected_header = 'application/json'
         random_uuid = str(uuid4())
