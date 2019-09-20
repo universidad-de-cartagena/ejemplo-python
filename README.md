@@ -1,12 +1,14 @@
 # Ejemplo en Python
 
-Para limpiar el repositorio
+## Comandos utiles en desarrollo
+
+### Limpiar el repositorio
 
 ```shell
 git clean -dx -e ".vs*" -e "env" -e ".env" -e "*.sqlite3" -f
 ```
 
-Para obtener test coverage
+### Test coverage
 
 ```shell
 coverage run --source='.' manage.py test --noinput
