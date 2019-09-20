@@ -16,7 +16,7 @@ pipeline {
         success {
           echo '====++++A executed succesfully++++===='
           sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
-          sh 'docker tag ejemplo-python:latest $DOCKERHUB_USR/equipo01-backend:latest'
+          sh 'docker tag equipo01-backend:latest $DOCKERHUB_USR/equipo01-backend:latest'
           sh 'docker push $DOCKERHUB_USR/equipo01-backend:latest'
         }
         failure {
@@ -25,7 +25,7 @@ pipeline {
         }
       }
       steps {
-        sh 'docker build -t ejemplo-python:latest .'
+        sh 'docker-compose build'
       }
     }
     stage('Tests') {
