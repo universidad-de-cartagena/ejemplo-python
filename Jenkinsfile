@@ -2,26 +2,26 @@ pipeline {
   agent {
     label 'equipo01'
   }
-  // environment {
-  //   DOCKERHUB_CREDENTIALS = credentials('dockerhub-account')
-  // }
+  environment {
+    DOCKERHUB = credentials('jenkinsudc-dockerhub-account')
+  }
   stages {
     stage('Kill everything') {
       steps {
-        sh 'docker-compose down -v -t 0 --remove-orphans --rmi local || true'
+        sh 'docker-compose down -v --remove-orphans || true'
       }
     }
     stage('Build image') {
       post {
         success {
           echo '====++++A executed succesfully++++===='
-          // sh "docker login --username ${DOCKERHUB_CREDENTIALS_USR} --password ${DOCKERHUB_CREDENTIALS_PSW}"
-          // sh 'docker tag ejemplo-python:latest equipo01-backend:latest'
-          // sh 'docker push equipo01-backend:latest'
+          sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
+          sh 'docker tag ejemplo-python:latest $DOCKERHUB_USR/equipo01-backend:latest'
+          sh 'docker push equipo01-backend:latest'
         }
         failure {
           echo '====++++A execution failed++++===='
-          sh 'docker container prune -f'
+          sh 'docker system prune --volumes --force'
         }
       }
       steps {
@@ -64,7 +64,8 @@ pipeline {
       post {
         failure {
           echo 'A execution failed'
-          echo 'docker-compose down -v -t 0 --remove-orphans --rmi all'
+          sh 'docker-compose down -v --remove-orphans || true'
+          sh 'docker system prune --volumes --force'
         }
       }
       steps {
