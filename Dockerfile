@@ -16,11 +16,12 @@ COPY notes/ notes/
 COPY ejemploPython/ ejemploPython/
 COPY manage.py .
 
-ENV DEBUG=False
+ENV DEBUG=False WAIT_HOSTS=database:3306
 
-# Convenient entrypoint
+# Convenient entrypoint and wait program
 COPY scripts/docker-entrypoint.sh /bin
-RUN chmod a+x /bin/docker-entrypoint.sh
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.6.0/wait /bin/wait
+RUN chmod a+x /bin/docker-entrypoint.sh /bin/wait
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Expose service

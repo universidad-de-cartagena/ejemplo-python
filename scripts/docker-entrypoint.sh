@@ -8,6 +8,9 @@ set -euo pipefail
 
 PREFIX="[*]"
 
+echo $PREFIX "Waiting for database"
+wait
+
 echo $PREFIX "Django check"
 touch ejemploPython/.env
 python3 manage.py check

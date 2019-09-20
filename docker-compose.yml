@@ -7,6 +7,7 @@ services:
     environment:
       - SECRET_KEY=cp&6^d7rb@gohfjt4ny8xz2w%!3m10uvlsik9aqe5
       - DATABASE_URL=mysql://root:password@database:3306/db
+      - WAIT_HOSTS=database:3306
     ports:
       - "8080:8080"
     depends_on:
