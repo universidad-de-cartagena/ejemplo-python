@@ -10,6 +10,7 @@ pipeline {
       steps {
         sh 'docker-compose down -v --remove-orphans || true'
         sh 'docker system prune --volumes --force || true'
+        sh 'docker container rm --force $(docker ps -a --quiet) || true'
       }
     }
     stage('Build image') {
