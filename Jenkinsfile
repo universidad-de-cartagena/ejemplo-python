@@ -17,11 +17,11 @@ pipeline {
           echo '====++++A executed succesfully++++===='
           sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
           sh 'docker tag ejemplo-python:latest $DOCKERHUB_USR/equipo01-backend:latest'
-          sh 'docker push equipo01-backend:latest'
+          sh 'docker push $DOCKERHUB_USR/equipo01-backend:latest'
         }
         failure {
           echo '====++++A execution failed++++===='
-          sh 'docker system prune --volumes --force'
+          sh 'docker system prune --volumes --force || true'
         }
       }
       steps {
@@ -65,7 +65,7 @@ pipeline {
         failure {
           echo 'A execution failed'
           sh 'docker-compose down -v --remove-orphans || true'
-          sh 'docker system prune --volumes --force'
+          sh 'docker system prune --volumes --force || true'
         }
       }
       steps {
