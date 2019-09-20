@@ -17,8 +17,8 @@ pipeline {
         success {
           echo '====++++A executed succesfully++++===='
           sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
-          sh 'docker tag equipo01-backend:latest $DOCKERHUB_USR/equipo01-backend:latest'
-          sh 'docker push $DOCKERHUB_USR/equipo01-backend:latest'
+          sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:latest'
+          sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:latest'
         }
         failure {
           echo '====++++A execution failed++++===='
