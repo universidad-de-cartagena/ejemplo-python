@@ -9,6 +9,7 @@ pipeline {
     stage('Kill everything') {
       steps {
         sh 'docker-compose down -v --remove-orphans || true'
+        sh 'docker system prune --volumes --force || true'
       }
     }
     stage('Build image') {
@@ -66,6 +67,7 @@ pipeline {
           echo 'A execution failed'
           sh 'docker-compose down -v --remove-orphans || true'
           sh 'docker system prune --volumes --force || true'
+          sh 'docker rmi --force $(docker images --quiet)'
         }
       }
       steps {
