@@ -8,8 +8,8 @@ pipeline {
   stages {
     stage('Docker huerfanos') {
       steps {
-        sh 'docker volume prune --force || true'
         sh 'docker container rm --force $(docker ps -a --quiet) || true'
+        sh 'docker volume prune --force || true'
         sh 'docker image prune -f'
       }
     }
@@ -35,7 +35,7 @@ pipeline {
           sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
           sh 'sudo apt-get install docker-compose -y -q'
           sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:latest'
-          sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:$GIT_COMMIT_SHORT'
+          sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:$BUILD_NUMBER-$GIT_COMMIT_SHORT'
           sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:latest'
         }
         failure {
@@ -57,8 +57,7 @@ pipeline {
             reportTitles: ''
           ])
         }
-        // cobertura(coberturaReportFile: 'reports/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', methodCoverageTargets: '80, 0, 0', sourceEncoding: 'ASCII')
-        publishCoverage adapters: [coberturaAdapter('reports/coverage.xml')], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+        cobertura(coberturaReportFile: 'reports/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', methodCoverageTargets: '80, 0, 0', sourceEncoding: 'ASCII')
         junit(testResults: 'reports/test_results/*.xml', allowEmptyResults: true)
         sh 'rm -rdf reports/'
       }
