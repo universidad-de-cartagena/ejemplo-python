@@ -35,8 +35,11 @@ pipeline {
           sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
           sh 'sudo apt-get install docker-compose -y -q'
           sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:latest'
+          sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:$GIT_COMMIT_SHORT'
           sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:$BUILD_NUMBER-$GIT_COMMIT_SHORT'
           sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:latest'
+          sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:$GIT_COMMIT_SHORT'
+          sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:$BUILD_NUMBER-$GIT_COMMIT_SHORT'
         }
         failure {
           sh 'echo ups'
