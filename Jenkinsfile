@@ -6,7 +6,7 @@ pipeline {
     DOCKERHUB = credentials('jenkinsudc-dockerhub-account')
   }
   stages {
-    stage('Remover elementos huerfanos') {
+    stage('Docker huerfanos') {
       steps {
         sh 'docker volume prune --force || true'
         sh 'docker container rm --force $(docker ps -a --quiet) || true'
@@ -57,7 +57,8 @@ pipeline {
             reportTitles: ''
           ])
         }
-        cobertura(coberturaReportFile: 'reports/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', methodCoverageTargets: '80, 0, 0', sourceEncoding: 'ASCII')
+        // cobertura(coberturaReportFile: 'reports/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', methodCoverageTargets: '80, 0, 0', sourceEncoding: 'ASCII')
+        publishCoverage adapters: [coberturaAdapter('reports/coverage.xml')], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
         junit(testResults: 'reports/test_results/*.xml', allowEmptyResults: true)
         sh 'rm -rdf reports/'
       }
