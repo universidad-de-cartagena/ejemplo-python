@@ -10,7 +10,4 @@ __pycache__/
 # Database
 *.sqlite3
 # Test reports
-test_results/
-coverage.xml
-.coverage
-htmlcov/
+reports/

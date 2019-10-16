@@ -6,73 +6,72 @@ pipeline {
     DOCKERHUB = credentials('jenkinsudc-dockerhub-account')
   }
   stages {
-    stage('Kill everything') {
+    stage('Remover elementos huerfanos') {
       steps {
-        sh 'docker-compose down -v --remove-orphans || true'
-        sh 'docker system prune --volumes --force || true'
+        sh 'docker volume prune --force || true'
         sh 'docker container rm --force $(docker ps -a --quiet) || true'
+        sh 'docker image prune -f'
       }
     }
     stage('Build image') {
+      // Solucion sencilla para obtener el SHA1 del commit en pipelines
+      // https://issues.jenkins-ci.org/browse/JENKINS-44449
+      environment {
+        GIT_COMMIT_SHORT = sh(
+          script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
+          returnStdout: true
+        )
+      }
+      steps {
+        sh 'docker-compose build --force-rm'
+        sh 'env'
+      }
       post {
         success {
-          echo '====++++A executed succesfully++++===='
+          // Bug reportado en golang-docker-credential-helpers que no permite
+          // autenticar el cliente Docker a un registry cuando se instala el
+          // paquete docker-compose en distribuciones basadas en Debian
+          sh 'sudo apt-get remove golang-docker-credential-helpers -y -q'
           sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
+          sh 'sudo apt-get install docker-compose -y -q'
           sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:latest'
+          sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:$GIT_COMMIT_SHORT'
           sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:latest'
         }
         failure {
-          echo '====++++A execution failed++++===='
-          sh 'docker system prune --volumes --force || true'
+          sh 'echo ups'
         }
-      }
-      steps {
-        sh 'docker-compose build'
       }
     }
     stage('Tests') {
-      agent {
-        docker {
-          label 'equipo01'
-          image 'python:3.7.4-stretch'
-        }
-      }
       steps {
-        sh 'python -m venv env'
-        sh './env/bin/pip3 install --no-cache-dir --upgrade pip'
-        sh './env/bin/pip3 install --no-cache-dir -r requirements.txt'
-        sh "./env/bin/coverage run --source '.' --omit 'env/*' manage.py test --no-input || true"
-        sh './env/bin/coverage report --show-missing -m'
-        sh './env/bin/coverage html'
+        sh 'docker-compose -f docker-compose.test.yml run -T --rm -e TEST_UID=$(id -u) -e TEST_GID=$(id -g) backend'
         script {
           publishHTML([
             allowMissing: false,
             alwaysLinkToLastBuild: true,
             keepAll: true,
-            reportDir: 'htmlcov/',
+            reportDir: 'reports/htmlcov/',
             reportFiles: 'index.html',
             reportName: 'Coverage report in HTML',
             reportTitles: ''
           ])
         }
-        sh 'rm -rf htmlcov'
-        sh './env/bin/coverage xml'
-        cobertura(coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', methodCoverageTargets: '80, 0, 0', sourceEncoding: 'ASCII')
-        sh 'rm .coverage coverage.xml'
-        junit(testResults: 'test_results/*.xml', allowEmptyResults: true)
+        cobertura(coberturaReportFile: 'reports/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', methodCoverageTargets: '80, 0, 0', sourceEncoding: 'ASCII')
+        junit(testResults: 'reports/test_results/*.xml', allowEmptyResults: true)
+        sh 'rm -rdf reports/'
       }
     }
     stage('Deploy') {
-      post {
-        failure {
-          echo 'A execution failed'
-          sh 'docker-compose down -v --remove-orphans || true'
-          sh 'docker system prune --volumes --force || true'
-          sh 'docker rmi --force $(docker images --quiet)'
-        }
-      }
       steps {
         sh 'docker-compose up -d'
+      }
+      post {
+        failure {
+          sh 'docker volume prune --force || true'
+          sh 'docker container rm --force $(docker ps -a --quiet) || true'
+          sh 'docker image prune -f'
+        }
       }
     }
   }

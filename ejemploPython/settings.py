@@ -119,7 +119,7 @@ USE_TZ = True
 
 # XML test generator https://github.com/xmlrunner/unittest-xml-reporting#django-support
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
-TEST_OUTPUT_DIR = join(BASE_DIR, "test_results")
+TEST_OUTPUT_DIR = join(BASE_DIR, "reports/test_results")
 
 # CORS
 # By default, CORS_ORIGIN_ALLOW_ALL is set to False, this tells Django to

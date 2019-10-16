@@ -1,0 +1,24 @@
+FROM python:3.7.4-stretch
+
+WORKDIR /app
+
+# Dependencies
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt \
+    && apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        python3-dev \
+        default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Code
+COPY notes/ notes/
+COPY ejemploPython/ ejemploPython/
+COPY manage.py .
+
+ENV DEBUG=True TEST_UID=1000 TEST_GID=1000
+
+# Convenient entrypoint
+COPY scripts/docker-entrypoint.test.sh /bin
+RUN chmod a+x /bin/docker-entrypoint.test.sh
+CMD "docker-entrypoint.test.sh"
