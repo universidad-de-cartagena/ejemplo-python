@@ -2,9 +2,6 @@ pipeline {
   agent {
     label 'equipo01'
   }
-  environment {
-    DOCKERHUB = credentials('jenkinsudc-dockerhub-account')
-  }
   stages {
     stage('Docker huerfanos') {
       steps {
@@ -13,10 +10,11 @@ pipeline {
         sh 'docker image prune -f'
       }
     }
-    stage('Build image') {
-      // Solucion sencilla para obtener el SHA1 del commit en pipelines
-      // https://issues.jenkins-ci.org/browse/JENKINS-44449
+    stage('Imagen Docker') {
       environment {
+        DOCKERHUB = credentials('jenkinsudc-dockerhub-account')
+        // Solucion sencilla para obtener el SHA1 del commit en pipelines
+        // https://issues.jenkins-ci.org/browse/JENKINS-44449
         GIT_COMMIT_SHORT = sh(
           script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
           returnStdout: true
@@ -24,7 +22,6 @@ pipeline {
       }
       steps {
         sh 'docker-compose build --force-rm'
-        sh 'env'
       }
       post {
         success {
@@ -42,13 +39,14 @@ pipeline {
           sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:$BUILD_NUMBER-$GIT_COMMIT_SHORT'
         }
         failure {
-          sh 'echo ups'
+          sh 'docker image prune -f'
         }
       }
     }
     stage('Tests') {
       steps {
         sh 'docker-compose -f docker-compose.test.yml run -T --rm -e TEST_UID=$(id -u) -e TEST_GID=$(id -g) backend'
+        junit(testResults: 'reports/test_results/*.xml', allowEmptyResults: true)
         script {
           publishHTML([
             allowMissing: false,
@@ -61,8 +59,11 @@ pipeline {
           ])
         }
         cobertura(coberturaReportFile: 'reports/coverage.xml', conditionalCoverageTargets: '70, 0, 0', lineCoverageTargets: '80, 0, 0', methodCoverageTargets: '80, 0, 0', sourceEncoding: 'ASCII')
-        junit(testResults: 'reports/test_results/*.xml', allowEmptyResults: true)
-        sh 'rm -rdf reports/'
+      }
+      post {
+        always {
+          sh 'rm -rdf reports/'
+        }
       }
     }
     stage('Deploy') {
@@ -71,8 +72,8 @@ pipeline {
       }
       post {
         failure {
-          sh 'docker volume prune --force || true'
           sh 'docker container rm --force $(docker ps -a --quiet) || true'
+          sh 'docker volume prune --force || true'
           sh 'docker image prune -f'
         }
       }
