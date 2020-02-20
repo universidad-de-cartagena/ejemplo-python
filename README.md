@@ -18,4 +18,4 @@ coverage xml
 rm .coverage coverage.xml
 ```
 
-## Despliegue
+## Docker
