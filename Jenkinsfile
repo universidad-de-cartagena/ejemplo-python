@@ -57,10 +57,6 @@ pipeline {
         )
       }
       steps {
-        // Bug reportado en golang-docker-credential-helpers que no permite
-        // autenticar el cliente Docker a un registry cuando se instala el
-        // paquete docker-compose en distribuciones basadas en Debian
-        sh 'sudo apt-get remove golang-docker-credential-helpers -y -q'
         sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
         sh 'sudo apt-get install docker-compose -y -q'
         sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:latest'
