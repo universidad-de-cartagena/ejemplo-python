@@ -3,41 +3,18 @@ pipeline {
     label 'equipo01'
   }
   stages {
-    stage('Docker huerfanos') {
+    stage('Limpiar elementos Docker huerfanos') {
       steps {
-        sh 'docker container rm --force $(docker ps -a --quiet) || true'
+        sh 'docker container prune --force || true'
         sh 'docker volume prune --force || true'
         sh 'docker image prune -f'
       }
     }
-    stage('Imagen Docker') {
-      environment {
-        DOCKERHUB = credentials('jenkinsudc-dockerhub-account')
-        // Solucion sencilla para obtener el SHA1 del commit en pipelines
-        // https://issues.jenkins-ci.org/browse/JENKINS-44449
-        GIT_COMMIT_SHORT = sh(
-          script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
-          returnStdout: true
-        )
-      }
-      steps {
+    stage('Crear de imagen Docker') {
+       steps {
         sh 'docker-compose build --force-rm'
       }
       post {
-        success {
-          // Bug reportado en golang-docker-credential-helpers que no permite
-          // autenticar el cliente Docker a un registry cuando se instala el
-          // paquete docker-compose en distribuciones basadas en Debian
-          sh 'sudo apt-get remove golang-docker-credential-helpers -y -q'
-          sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
-          sh 'sudo apt-get install docker-compose -y -q'
-          sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:latest'
-          sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:$GIT_COMMIT_SHORT'
-          sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:$BUILD_NUMBER-$GIT_COMMIT_SHORT'
-          sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:latest'
-          sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:$GIT_COMMIT_SHORT'
-          sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:$BUILD_NUMBER-$GIT_COMMIT_SHORT'
-        }
         failure {
           sh 'docker image prune -f'
         }
@@ -66,13 +43,47 @@ pipeline {
         }
       }
     }
+    stage('Publicar imagen Docker') {
+      when {
+          branch 'master'
+      }
+      environment {
+        DOCKERHUB = credentials('jenkinsudc-dockerhub-account')
+        // Solucion sencilla para obtener el SHA1 del commit en pipelines
+        // https://issues.jenkins-ci.org/browse/JENKINS-44449
+        GIT_COMMIT_SHORT = sh(
+          script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
+          returnStdout: true
+        )
+      }
+      steps {
+        // Bug reportado en golang-docker-credential-helpers que no permite
+        // autenticar el cliente Docker a un registry cuando se instala el
+        // paquete docker-compose en distribuciones basadas en Debian
+        sh 'sudo apt-get remove golang-docker-credential-helpers -y -q'
+        sh 'docker login --username $DOCKERHUB_USR --password $DOCKERHUB_PSW'
+        sh 'sudo apt-get install docker-compose -y -q'
+        sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:latest'
+        sh 'docker tag equipo01-backend-python:latest $DOCKERHUB_USR/equipo01-backend-python:$GIT_COMMIT_SHORT'
+        sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:latest'
+        sh 'docker push $DOCKERHUB_USR/equipo01-backend-python:$GIT_COMMIT_SHORT'
+      }
+      post {
+        failure {
+          sh 'docker image prune -f'
+        }
+      }
+    }
     stage('Deploy') {
+      when {
+          branch 'master'
+      }
       steps {
         sh 'docker-compose up -d'
       }
       post {
         failure {
-          sh 'docker container rm --force $(docker ps -a --quiet) || true'
+          sh 'docker container prune --force || true'
           sh 'docker volume prune --force || true'
           sh 'docker image prune -f'
         }
