@@ -1,15 +1,17 @@
-FROM python:3.7.4-stretch
+FROM docker.io/python:3.13-trixie
 
 WORKDIR /app
 
-# Dependencies
-COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt \
-    && apt-get update -y \
+# Build dependencies
+RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
-        python3-dev \
-        default-libmysqlclient-dev \
+        python3-dev default-libmysqlclient-dev \
+        build-essential pkg-config \
     && rm -rf /var/lib/apt/lists/*
+
+# Pip dependencies
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Code
 COPY notes/ notes/

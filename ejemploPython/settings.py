@@ -79,8 +79,17 @@ WSGI_APPLICATION = 'ejemploPython.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+#DATABASES = {
+#    'default': env.db_url()
+#}
 DATABASES = {
-    'default': env.db()
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'db',
+        'USER': 'root',
+        'PASSWORD': 'password',
+        'HOST': 'database'
+    }
 }
 
 
