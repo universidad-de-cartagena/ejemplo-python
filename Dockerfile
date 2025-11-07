@@ -1,16 +1,16 @@
-FROM docker.io/python:3.13-trixie
+FROM docker.io/python:3.13-slim-trixie
 
 WORKDIR /app
 
-# Build dependencies
-RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends \
-        libpython3-dev default-libmysqlclient-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Pip dependencies
+# Pip dependencies, mysqlclient requires build deps that are auto removed for space
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN apt update -y \
+    && apt install -y --no-install-recommends \
+        build-essential pkg-config libpython3-dev default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install --no-cache-dir -r requirements.txt \
+    && apt remove -y build-essential pkg-config libpython3-dev default-libmysqlclient-dev \
+    && apt autoremove -y
 
 # Code
 COPY notes/ notes/
