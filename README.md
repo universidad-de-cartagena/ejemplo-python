@@ -1,5 +1,27 @@
 # Ejemplo en Python
 
+## Docker en este repo
+
+Durante desarrollo local, podria ser util utilizar `uv pip` con un contenedor efimero. Reemplaza 1000:1000 por el UID:GID.
+
+```shell
+docker run --rm -it -v $PWD:/app -w /app -p 8080:8080 --user="1000:1000" ghcr.io/astral-sh/uv:debian bash
+```
+
+Otros posibles tags a usar son:
+
+```
+alpine
+bookworm
+bookworm-slim
+debian
+debian-slim
+initial
+latest
+trixie
+trixie-slim
+```
+
 ## Comandos utiles en desarrollo
 
 ### Limpiar el repositorio durante desarrollo
