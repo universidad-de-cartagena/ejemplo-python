@@ -5,7 +5,7 @@ from django.db import models
 
 class Note(models.Model):
     uuid = models.UUIDField(
-        default=uuid4, editable=False, db_index=True, unique=True
+        default=uuid4, editable=False, db_index=True, unique=True, primary_key=True
     )
     author = models.CharField(max_length=32)
     title = models.CharField(max_length=32)

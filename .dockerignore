@@ -1,0 +1,27 @@
+# Git
+.git/
+
+# Docker files
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Database
+*.sqlite3
+
+# Test reports
+reports/
+
+# IDE
+.vscode/
+
+# Environment variables
+.env
+
+# Compiled translations
+*.mo
+
+# Python virtual env
+.env/
+env/
+__pycache__/

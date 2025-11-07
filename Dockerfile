@@ -5,8 +5,7 @@ WORKDIR /app
 # Build dependencies
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
-        python3-dev default-libmysqlclient-dev \
-        build-essential pkg-config \
+        libpython3-dev default-libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Pip dependencies

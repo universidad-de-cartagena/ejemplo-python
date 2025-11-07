@@ -14,7 +14,7 @@ services:
       - database
 
   database:
-    image: docker.io/mariadb:10.4
+    image: docker.io/mariadb:10.5
     ports:
       - "3306:3306"
     environment:
