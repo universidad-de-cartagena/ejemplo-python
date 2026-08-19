@@ -26,6 +26,12 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY notes/ notes/
 COPY ejemploPython/ ejemploPython/
 COPY manage.py .
+COPY observability/ observability/
+
+ENV OTEL_SERVICE_NAME=ejemplo-python \
+    OTEL_SERVICE_VERSION=1.0.0 \
+    OTEL_ENVIRONMENT=development \
+    OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
 
 ENV DEBUG=False WAIT_HOSTS=database:3306
 
