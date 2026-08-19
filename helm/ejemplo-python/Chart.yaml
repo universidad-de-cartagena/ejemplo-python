@@ -1,0 +1,8 @@
+apiVersion: v2
+name: ejemplo-python
+description: Helm chart for ejemplo-python Django application
+type: application
+version: 0.1.0
+appVersion: "3.11"
+maintainers:
+  - name: amauryortega
