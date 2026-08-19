@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ejemplo-python
+  labels:
+    app.kubernetes.io/name: ejemplo-python
+    app.kubernetes.io/part-of: ejemplo-apps

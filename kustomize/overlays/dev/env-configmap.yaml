@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ejemplo-python-env
+data:
+  ENVIRONMENT: "dev"
+  DEBUG: "true"
+  LOG_LEVEL: "debug"
+  WAIT_HOSTS: "database:3306"
