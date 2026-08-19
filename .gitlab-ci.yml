@@ -49,8 +49,9 @@ test:
     - apt-get update && apt-get install -y --no-install-recommends gcc default-libmysqlclient-dev python3-dev pkg-config && rm -rf /var/lib/apt/lists/*
     - pip install --no-cache-dir -r requirements.txt
   script:
-    - python -m pytest tests/ --junitxml=report.xml --tb=short
-    - python -m coverage run -m unittest discover -s tests -t .
+    - python -m pytest notes/ --junitxml=report.xml --tb=short
+    - python -m coverage run -m pytest notes/ --tb=short
+    - python -m coverage report
   artifacts:
     reports:
       junit: report.xml
