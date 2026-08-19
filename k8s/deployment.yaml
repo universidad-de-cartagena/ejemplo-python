@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ejemplo-python
+  labels:
+    app: ejemplo-python
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ejemplo-python
+  template:
+    metadata:
+      labels:
+        app: ejemplo-python
+    spec:
+      containers:
+        - name: ejemplo-python
+          image: registry.gitlab.com/amauryortega/ejemplo-python:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: ejemplo-python-config
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi

@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../k8s
+  - ../../base
+
+namePrefix: staging-
+
+namespace: ejemplo-python
+
+patches:
+  - path: replica-patch.yaml
+    target:
+      kind: Deployment
+      name: ejemplo-python
+  - path: resource-limits.yaml
+    target:
+      kind: Deployment
+      name: ejemplo-python
+
+configMapGenerator:
+  - name: ejemplo-python-env
+    behavior: create
+    literals:
+      - ENVIRONMENT=staging
+      - DEBUG=false
+      - LOG_LEVEL=info
+
+generatorOptions:
+  disableNameSuffixHash: true

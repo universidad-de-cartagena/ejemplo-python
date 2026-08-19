@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../k8s
+  - ../../base
+  - hpa.yaml
+  - pdb.yaml
+  - networkpolicy.yaml
+
+namePrefix: prod-
+
+namespace: ejemplo-python
+
+patches:
+  - path: replica-patch.yaml
+    target:
+      kind: Deployment
+      name: ejemplo-python
+  - path: resource-limits.yaml
+    target:
+      kind: Deployment
+      name: ejemplo-python
+
+configMapGenerator:
+  - name: ejemplo-python-env
+    behavior: create
+    literals:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - LOG_LEVEL=warn
+
+generatorOptions:
+  disableNameSuffixHash: true

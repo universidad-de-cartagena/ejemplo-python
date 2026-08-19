@@ -13,4 +13,10 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ejemploPython.settings')
 
+try:
+    from observability.opentelemetry_config import setup_opentelemetry
+    setup_opentelemetry()
+except ImportError:
+    pass
+
 application = get_wsgi_application()

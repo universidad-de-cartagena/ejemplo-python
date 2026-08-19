@@ -1,5 +1,6 @@
 asgiref==3.2.7               
 coverage==5.1                
+pytest>=7.0.0
 Django==3.0.7                
 django-cors-headers==3.2.1   
 django-environ==0.4.5        
@@ -8,3 +9,11 @@ namegenerator==1.0.6
 pytz==2020.1                 
 sqlparse==0.3.0              
 unittest-xml-reporting==3.0.2
+
+# OpenTelemetry
+opentelemetry-api>=1.22.0
+opentelemetry-sdk>=1.22.0
+opentelemetry-exporter-otlp-proto-grpc>=1.22.0
+opentelemetry-instrumentation-django>=0.43b0
+opentelemetry-instrumentation-requests>=0.43b0
+opentelemetry-instrumentation-mysql>=0.43b0
