@@ -21,7 +21,7 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
 
 COPY notes/ notes/
 COPY ejemploPython/ ejemploPython/
